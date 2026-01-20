@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [selectedModelId, setSelectedModelId] = useState('');
   const [tvModels, setTvModels] = useState<TvModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchTvModels() {
@@ -71,12 +72,27 @@ const App: React.FC = () => {
   const currentModel = tvModels.find(m => m.id === selectedModelId) || tvModels[0];
 
   return (
-    <div className="relative w-full min-h-[100dvh] bg-background-light dark:bg-background-dark overflow-hidden mx-auto max-w-[480px] shadow-2xl">
+    <div className="relative w-full h-[100dvh] bg-background-light dark:bg-background-dark overflow-hidden mx-auto max-w-[390px] shadow-2xl flex flex-col">
       {currentScreen === AppScreen.HOME && <HomeScreen onNavigate={navigate} />}
       {currentScreen === AppScreen.AR_STEP_1 && <ArMeasureStep1 onNavigate={navigate} />}
-      {currentScreen === AppScreen.AR_STEP_2 && <ArMeasureStep2 onNavigate={navigate} />}
-      {currentScreen === AppScreen.AR_STEP_3 && <ArMeasureStep3 onNavigate={navigate} />}
-      {currentScreen === AppScreen.ANALYSIS_RESULT && <AnalysisResult onNavigate={navigate} />}
+      {currentScreen === AppScreen.AR_STEP_2 && (
+        <ArMeasureStep2
+          onNavigate={navigate}
+          onCapture={(img) => setCapturedImage(img)}
+        />
+      )}
+      {currentScreen === AppScreen.AR_STEP_3 && (
+        <ArMeasureStep3
+          onNavigate={navigate}
+          onCapture={(img) => setCapturedImage(img)}
+        />
+      )}
+      {currentScreen === AppScreen.ANALYSIS_RESULT && (
+        <AnalysisResult
+          onNavigate={navigate}
+          capturedImage={capturedImage}
+        />
+      )}
 
       {currentScreen === AppScreen.TV_SELECTION && (
         <TvSelection
@@ -94,6 +110,7 @@ const App: React.FC = () => {
           onNavigate={navigate}
           selectedSize={selectedSize}
           model={currentModel}
+          backgroundImage={capturedImage}
         />
       )}
 
@@ -102,6 +119,7 @@ const App: React.FC = () => {
           onNavigate={navigate}
           selectedSize={selectedSize}
           model={currentModel}
+          backgroundImage={capturedImage}
         />
       )}
     </div>

@@ -5,9 +5,10 @@ interface Props {
   onNavigate: (screen: AppScreen) => void;
   selectedSize: number;
   model: TvModel;
+  backgroundImage: string | null;
 }
 
-const LandscapeView: React.FC<Props> = ({ onNavigate, selectedSize, model }) => {
+const LandscapeView: React.FC<Props> = ({ onNavigate, selectedSize, model, backgroundImage }) => {
   const currentModel = model;
 
   return (
@@ -16,7 +17,7 @@ const LandscapeView: React.FC<Props> = ({ onNavigate, selectedSize, model }) => 
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuACOsQJHC4Iopwikz21hrCO43WTWJUDEd2zxIo389aeQVofZPuTf0f2U3BfsO0iw5wrzsV7Tob_cCrFGqXEbW55bXWrYics4PmSUP-64ARpXtb5iz7BHqoFhiMZX8VQP1h0P-GKumgEBun7wlcL4lmJzccPeLzO17WykDl7e80we7T0duNgwI6vxghQZd_MUZV53qk1ln3V3DQtdS47SKEx7OfwFwzTFrc45DF761MVTOUgzNAtmdw4m80YqLFlRBDDJ1QKjsMOWC4U')" }}
+          style={{ backgroundImage: `url('${backgroundImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuACOsQJHC4Iopwikz21hrCO43WTWJUDEd2zxIo389aeQVofZPuTf0f2U3BfsO0iw5wrzsV7Tob_cCrFGqXEbW55bXWrYics4PmSUP-64ARpXtb5iz7BHqoFhiMZX8VQP1h0P-GKumgEBun7wlcL4lmJzccPeLzO17WykDl7e80we7T0duNgwI6vxghQZd_MUZV53qk1ln3V3DQtdS47SKEx7OfwFwzTFrc45DF761MVTOUgzNAtmdw4m80YqLFlRBDDJ1QKjsMOWC4U"}')` }}
         >
           <div className="absolute inset-0 bg-black/10"></div>
         </div>

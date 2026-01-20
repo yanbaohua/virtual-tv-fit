@@ -5,9 +5,10 @@ interface Props {
   onNavigate: (screen: AppScreen) => void;
   selectedSize: number;
   model: TvModel;
+  backgroundImage: string | null;
 }
 
-const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model }) => {
+const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgroundImage }) => {
   const [showShareSheet, setShowShareSheet] = useState(false);
   const currentModel = model;
 
@@ -29,7 +30,7 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model }) => {
           {/* Image Section - Square aspect ratio to crop ceiling and reduce height */}
           <div className="relative aspect-square w-full bg-gray-200">
             {/* Background positioned to show more bottom/center (TV + Floor), cropping top (Ceiling) */}
-            <div className="absolute inset-0 bg-cover" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQ7kzg7cHJgUmFgoJvkJcZm5ZjViyOdLaTCTcvyKJ8NNxUEbwIE-2w9cdVHoxJ2AOJQ2Hw0Aj3e-viAE2MHnf6c-K8ungoeGrAZn8qNUN3JckPLQwR83cAO2Tj0aMJJsrRqAosbNmjhmVTViwWitKLhlA1_NDvH3dNVNzIwlQRsNo5mq7Gm0Wvwg9HTRR-e2XycuyS5l8PzFFKxpTtg8W82v-W3p2UOeXAypW0Nu8WIoWbjwUYchoFwqnFeXbU_4TNPh28I1x_zUEo')", backgroundPosition: "center 80%" }}></div>
+            <div className="absolute inset-0 bg-cover" style={{ backgroundImage: `url('${backgroundImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuCQ7kzg7cHJgUmFgoJvkJcZm5ZjViyOdLaTCTcvyKJ8NNxUEbwIE-2w9cdVHoxJ2AOJQ2Hw0Aj3e-viAE2MHnf6c-K8ungoeGrAZn8qNUN3JckPLQwR83cAO2Tj0aMJJsrRqAosbNmjhmVTViwWitKLhlA1_NDvH3dNVNzIwlQRsNo5mq7Gm0Wvwg9HTRR-e2XycuyS5l8PzFFKxpTtg8W82v-W3p2UOeXAypW0Nu8WIoWbjwUYchoFwqnFeXbU_4TNPh28I1x_zUEo"}')`, backgroundPosition: "center 80%" }}></div>
             {/* Gradient overlay for text visibility */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
