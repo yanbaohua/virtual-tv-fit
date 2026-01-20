@@ -1,0 +1,7 @@
+{
+  "name": "Virtual TV Fit",
+  "description": "AR-powered application to measure living room dimensions and simulate TV sizes.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
