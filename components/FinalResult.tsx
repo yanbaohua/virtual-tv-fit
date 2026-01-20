@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import html2canvas from 'html2canvas';
 import { AppScreen, TvModel } from '../types';
 
 interface Props {
@@ -10,7 +11,73 @@ interface Props {
 
 const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgroundImage }) => {
   const [showShareSheet, setShowShareSheet] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const resultCardRef = useRef<HTMLDivElement>(null);
   const currentModel = model;
+
+  const handleSave = async () => {
+    if (!resultCardRef.current) return;
+
+    try {
+      setIsSaving(true);
+
+      // Use html2canvas to capture the specific element
+      const canvas = await html2canvas(resultCardRef.current, {
+        useCORS: true,
+        scale: 2,
+        backgroundColor: null,
+      });
+
+      // Prefer blob for sharing/performance
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          alert("图片生成失败");
+          return;
+        }
+
+        const fileName = `virtual-tv-fit-result-${Date.now()}.png`;
+        const file = new File([blob], fileName, { type: 'image/png' });
+
+        // Try native sharing first (works best on mobile)
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: '我的客厅电视方案',
+              text: '看看这个电视尺寸放在我家合不合适！',
+            });
+            setIsSaving(false);
+            return; // Exit if shared successfully
+          } catch (shareError) {
+            console.log('Share canceled or failed, falling back to download', shareError);
+            // Fallback to download if share is canceled or fails (but user might have just cancelled)
+          }
+        }
+
+        // Fallback: Download via <a> tag
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+      }, 'image/png');
+
+    } catch (err) {
+      console.error("Failed to save image:", err);
+      alert("保存失败，请重试");
+    } finally {
+      // Note: isSaving is set to false in the callback above or here if error, 
+      // but to be safe we might want to ensure it turns off. 
+      // Since toBlob is async, we doing it inside is better, but this finally block runs immediately after *starting* the canvas process, not after toBlob.
+      // So let's actually remove setIsSaving(false) from here and ensure it's called in all paths above.
+
+      // Wait a bit to ensure UI updates if strictly sync, but here we just leave it to the callback.
+      setTimeout(() => setIsSaving(false), 2000); // Failsafe timeout
+    }
+  };
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-body h-screen w-full relative flex flex-col overflow-hidden">
@@ -25,7 +92,7 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
       <main className="flex-1 overflow-y-auto no-scrollbar px-6 pb-48 pt-4 relative">
 
         {/* Result Card */}
-        <div className="w-full bg-white dark:bg-[#1a222f] rounded-[2rem] overflow-hidden shadow-2xl relative mb-6">
+        <div ref={resultCardRef} className="w-full bg-white dark:bg-[#1a222f] rounded-[2rem] overflow-hidden shadow-2xl relative mb-6">
 
           {/* Image Section - Square aspect ratio to crop ceiling and reduce height */}
           <div className="relative aspect-square w-full bg-gray-200">
@@ -44,11 +111,7 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
             {/* Gradient overlay for text visibility */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
-            {/* AR Badge */}
-            <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-              <span className="material-symbols-outlined text-white text-[16px]">view_in_ar</span>
-              <span className="text-white text-xs font-semibold tracking-wide">AR 预览</span>
-            </div>
+            {/* AR Badge - Removed as per user request */}
 
             {/* TV Info Overlay */}
             <div className="absolute bottom-[28px] left-6 right-6 z-10">
@@ -91,9 +154,22 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
       <div className="absolute bottom-0 left-0 right-0 z-20 w-full flex flex-col items-center pb-6 pt-12 bg-gradient-to-t from-background-light via-background-light/95 to-transparent dark:from-background-dark dark:via-background-dark/95 px-6">
 
         {/* Save Button - Adjusted padding for lower position */}
-        <button className="w-full max-w-[340px] h-14 bg-[#0052cc] hover:bg-blue-600 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-blue-500/30 transition-transform active:scale-[0.98] mb-3">
-          <span className="material-symbols-outlined text-[24px]">download</span>
-          <span>保存到相册</span>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="w-full max-w-[340px] h-14 bg-[#0052cc] hover:bg-blue-600 disabled:bg-blue-400 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-blue-500/30 transition-transform active:scale-[0.98] mb-3"
+        >
+          {isSaving ? (
+            <>
+              <span className="material-symbols-outlined text-[24px] animate-spin">progress_activity</span>
+              <span>保存中...</span>
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined text-[24px]">download</span>
+              <span>保存到相册</span>
+            </>
+          )}
         </button>
 
         {/* New Simulation Link */}

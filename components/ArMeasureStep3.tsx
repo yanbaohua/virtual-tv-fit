@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import Webcam from 'react-webcam';
 import { AppScreen } from '../types';
 
@@ -9,15 +9,22 @@ interface Props {
 
 const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
   const webcamRef = useRef<Webcam>(null);
+  const [frozenImage, setFrozenImage] = useState<string | null>(null);
 
   const handleNext = useCallback(() => {
-    // Capture the image when finishing the flow (this will be the background)
-    const imageSrc = webcamRef.current?.getScreenshot();
-    if (imageSrc) {
-      onCapture(imageSrc);
+    // If not frozen yet, freeze it first
+    if (!frozenImage) {
+      const imageSrc = webcamRef.current?.getScreenshot();
+      if (imageSrc) {
+        setFrozenImage(imageSrc);
+      }
+      return;
     }
+
+    // If already frozen, proceed
+    onCapture(frozenImage);
     onNavigate(AppScreen.ANALYSIS_RESULT);
-  }, [onNavigate, onCapture]);
+  }, [frozenImage, onNavigate, onCapture]);
 
   const videoConstraints = {
     facingMode: "environment"
@@ -26,22 +33,26 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
   return (
     <div className="font-sans bg-black text-slate-900 h-[100dvh] w-full overflow-hidden flex items-center justify-center relative">
       <div className="relative h-full w-full mx-auto bg-slate-900 overflow-hidden flex flex-col group/design-root">
-        {/* Background - Webcam */}
+        {/* Background - Webcam or Frozen Image */}
         <div className="absolute inset-0 z-0 bg-slate-800">
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            videoConstraints={videoConstraints}
-            className="h-full w-full object-cover opacity-90"
-            forceScreenshotSourceSize={true}
-            mirrored={false}
-            disablePictureInPicture={true}
-            imageSmoothing={true}
-            screenshotQuality={0.92}
-            onUserMediaError={(e) => console.log(e)}
-            onUserMedia={() => console.log("Camera loaded")}
-          />
+          {frozenImage ? (
+            <img src={frozenImage} alt="Captured" className="h-full w-full object-cover" />
+          ) : (
+            <Webcam
+              audio={false}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              videoConstraints={videoConstraints}
+              className="h-full w-full object-cover opacity-90"
+              forceScreenshotSourceSize={true}
+              mirrored={false}
+              disablePictureInPicture={true}
+              imageSmoothing={true}
+              screenshotQuality={0.92}
+              onUserMediaError={(e) => console.log(e)}
+              onUserMedia={() => console.log("Camera loaded")}
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/70 pointer-events-none"></div>
           <div className="absolute inset-0 ar-grid opacity-20 pointer-events-none"></div>
         </div>
@@ -125,22 +136,27 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
             </div>
           </div>
 
-          {/* Reticle & Lines */}
-          <div className="relative flex items-center justify-center size-14 mt-4">
-            <div className="size-2 bg-primary rounded-full shadow-[0_0_12px_rgba(0,82,204,1)] z-20"></div>
-            <div className="absolute inset-0 rounded-full border-[2px] border-white/80 shadow-[0_0_10px_rgba(0,0,0,0.3)]"></div>
-            <div className="absolute w-full h-[1px] bg-white/40"></div>
-            <div className="absolute h-full w-[1px] bg-white/40"></div>
-          </div>
-
-          <div className="relative w-full h-16 flex justify-center items-start">
-            <div className="h-full w-[1px] border-l border-dashed border-primary/40"></div>
-            <div className="absolute bottom-0 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full border border-primary/30 bg-primary/5 flex items-center justify-center">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
+          {!frozenImage && (
+            <>
+              {/* Reticle & Lines (Only show when not frozen for cleaner look) */}
+              <div className="relative flex items-center justify-center size-14 mt-4">
+                <div className="size-2 bg-primary rounded-full shadow-[0_0_12px_rgba(0,82,204,1)] z-20"></div>
+                <div className="absolute inset-0 rounded-full border-[2px] border-white/80 shadow-[0_0_10px_rgba(0,0,0,0.3)]"></div>
+                <div className="absolute w-full h-[1px] bg-white/40"></div>
+                <div className="absolute h-full w-[1px] bg-white/40"></div>
               </div>
-            </div>
-          </div>
+
+              <div className="relative w-full h-16 flex justify-center items-start">
+                <div className="h-full w-[1px] border-l border-dashed border-primary/40"></div>
+                <div className="absolute bottom-0 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full border border-primary/30 bg-primary/5 flex items-center justify-center">
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
         </div>
 
         {/* Bottom Actions */}
@@ -148,7 +164,7 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
           <div className="px-5 py-2.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 shadow-xl">
             <p className="text-white text-xs font-medium leading-normal text-center flex items-center gap-2.5">
               <span className="material-symbols-outlined text-primary text-[16px]">screen_search_desktop</span>
-              请上下左右扫描以确认墙面完整尺寸
+              {frozenImage ? "已锁定墙面，点击完成以继续" : "请上下左右扫描以确认墙面完整尺寸"}
             </p>
           </div>
           <div className="flex w-full px-6 justify-center">
@@ -156,8 +172,12 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
               onClick={handleNext}
               className="flex w-full max-w-[280px] cursor-pointer items-center justify-center rounded-full h-12 bg-primary hover:bg-primary/90 active:scale-95 transition-all shadow-[0_0_24px_rgba(0,82,204,0.4)] border border-white/20"
             >
-              <span className="text-white text-base font-bold leading-normal tracking-wide mr-2">下一步</span>
-              <span className="material-symbols-outlined text-white text-[18px]">arrow_forward</span>
+              <span className="text-white text-base font-bold leading-normal tracking-wide mr-2">
+                {frozenImage ? "完成并预览" : "拍摄墙面"}
+              </span>
+              <span className="material-symbols-outlined text-white text-[18px]">
+                {frozenImage ? "check" : "camera_alt"}
+              </span>
             </button>
           </div>
         </div>
