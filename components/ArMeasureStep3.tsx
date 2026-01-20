@@ -22,9 +22,9 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
     }
 
     // If already frozen, proceed
+    // If already frozen, proceed
     onCapture(frozenImage);
-    // Skip AnalysisResult screen as requested, go straight to TV Selection
-    onNavigate(AppScreen.TV_SELECTION);
+    onNavigate(AppScreen.ANALYSIS_RESULT);
   }, [frozenImage, onNavigate, onCapture]);
 
   const videoConstraints = {

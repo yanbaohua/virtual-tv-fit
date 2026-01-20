@@ -47,7 +47,7 @@ const TvSelection: React.FC<Props> = ({
     <div className="bg-background-light dark:bg-background-dark font-body text-slate-900 dark:text-white h-screen flex flex-col overflow-hidden relative">
       {/* Top Bar */}
       <div className="absolute top-0 left-0 w-full z-20 flex items-center justify-between p-4 pt-4 mt-8 bg-transparent">
-        <button onClick={() => onNavigate(AppScreen.AR_STEP_3)} className="flex items-center justify-center size-10 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition-colors border border-white/10">
+        <button onClick={() => onNavigate(AppScreen.ANALYSIS_RESULT)} className="flex items-center justify-center size-10 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition-colors border border-white/10">
           <span className="material-symbols-outlined text-[24px]">arrow_back</span>
         </button>
         <h2 className="text-white text-base font-bold tracking-wide drop-shadow-md opacity-0">AR 预览</h2>
