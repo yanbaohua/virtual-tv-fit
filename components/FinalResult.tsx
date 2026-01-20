@@ -30,7 +30,17 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
           {/* Image Section - Square aspect ratio to crop ceiling and reduce height */}
           <div className="relative aspect-square w-full bg-gray-200">
             {/* Background positioned to show more bottom/center (TV + Floor), cropping top (Ceiling) */}
-            <div className="absolute inset-0 bg-cover" style={{ backgroundImage: `url('${backgroundImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuCQ7kzg7cHJgUmFgoJvkJcZm5ZjViyOdLaTCTcvyKJ8NNxUEbwIE-2w9cdVHoxJ2AOJQ2Hw0Aj3e-viAE2MHnf6c-K8ungoeGrAZn8qNUN3JckPLQwR83cAO2Tj0aMJJsrRqAosbNmjhmVTViwWitKLhlA1_NDvH3dNVNzIwlQRsNo5mq7Gm0Wvwg9HTRR-e2XycuyS5l8PzFFKxpTtg8W82v-W3p2UOeXAypW0Nu8WIoWbjwUYchoFwqnFeXbU_4TNPh28I1x_zUEo"}')`, backgroundPosition: "center 80%" }}></div>
+            <div className="absolute inset-0 bg-cover" style={{ backgroundImage: `url('${backgroundImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuCQ7kzg7cHJgUmFgoJvkJcZm5ZjViyOdLaTCTcvyKJ8NNxUEbwIE-2w9cdVHoxJ2AOJQ2Hw0Aj3e-viAE2MHnf6c-K8ungoeGrAZn8qNUN3JckPLQwR83cAO2Tj0aMJJsrRqAosbNmjhmVTViwWitKLhlA1_NDvH3dNVNzIwlQRsNo5mq7Gm0Wvwg9HTRR-e2XycuyS5l8PzFFKxpTtg8W82v-W3p2UOeXAypW0Nu8WIoWbjwUYchoFwqnFeXbU_4TNPh28I1x_zUEo"}')`, backgroundPosition: "center 80%" }}>
+              {/* TV Overlay */}
+              <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] z-20">
+                <div className="relative aspect-video shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                  <img src={currentModel.image} alt="TV Model" className="w-full h-full object-cover rounded-[2px]" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none rounded-[2px]"></div>
+                  {/* Ambilight glow */}
+                  <div className="absolute -inset-10 bg-blue-500/20 blur-3xl -z-10 rounded-full opacity-60"></div>
+                </div>
+              </div>
+            </div>
             {/* Gradient overlay for text visibility */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 

@@ -135,8 +135,8 @@ const ArMeasureStep2: React.FC<Props> = ({ onNavigate, onCapture }) => {
               onClick={handleNext}
               className="flex w-full max-w-[280px] cursor-pointer items-center justify-center rounded-full h-12 bg-primary hover:bg-primary/90 active:scale-95 transition-all shadow-[0_0_24px_rgba(0,82,204,0.4)] border border-white/20"
             >
-              <span className="text-white text-base font-bold leading-normal tracking-wide mr-2">完成</span>
-              <span className="material-symbols-outlined text-white text-[18px]">check</span>
+              <span className="text-white text-base font-bold leading-normal tracking-wide mr-2">下一步</span>
+              <span className="material-symbols-outlined text-white text-[18px]">arrow_forward</span>
             </button>
           </div>
         </div>
