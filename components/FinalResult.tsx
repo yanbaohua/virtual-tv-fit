@@ -187,15 +187,15 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
       </div>
 
       {/* Top Floating Buttons */}
-      <div className="absolute top-0 left-0 right-0 p-4 pt-12 flex justify-between items-center z-30 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 p-4 pt-4 mt-8 flex justify-between items-center z-30 pointer-events-none">
         {/* Back Button */}
         <button onClick={() => onNavigate(AppScreen.TV_SELECTION)} className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-slate-100/50 hover:bg-slate-200/50 dark:bg-white/10 dark:hover:bg-white/20 transition-colors backdrop-blur-md">
-          <span className="material-symbols-outlined text-slate-900 dark:text-white text-[20px]">arrow_back</span>
+          <span className="material-symbols-outlined text-slate-900 dark:text-white text-[24px]">arrow_back</span>
         </button>
 
         {/* Share Button (Triggers Sheet) */}
         <button onClick={() => setShowShareSheet(true)} className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-slate-100/50 hover:bg-slate-200/50 dark:bg-white/10 dark:hover:bg-white/20 transition-colors backdrop-blur-md">
-          <span className="material-symbols-outlined text-slate-900 dark:text-white text-[20px]">ios_share</span>
+          <span className="material-symbols-outlined text-slate-900 dark:text-white text-[24px]">ios_share</span>
         </button>
       </div>
 

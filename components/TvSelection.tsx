@@ -46,13 +46,13 @@ const TvSelection: React.FC<Props> = ({
   return (
     <div className="bg-background-light dark:bg-background-dark font-body text-slate-900 dark:text-white h-screen flex flex-col overflow-hidden relative">
       {/* Top Bar */}
-      <div className="absolute top-0 left-0 w-full z-20 flex items-center justify-between p-4 pt-12 bg-gradient-to-b from-black/60 to-transparent">
-        <button onClick={() => onNavigate(AppScreen.ANALYSIS_RESULT)} className="flex items-center justify-center size-10 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition-colors border border-white/10">
-          <span className="material-symbols-outlined">arrow_back</span>
+      <div className="absolute top-0 left-0 w-full z-20 flex items-center justify-between p-4 pt-4 mt-8 bg-transparent">
+        <button onClick={() => onNavigate(AppScreen.AR_STEP_3)} className="flex items-center justify-center size-10 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition-colors border border-white/10">
+          <span className="material-symbols-outlined text-[24px]">arrow_back</span>
         </button>
-        <h2 className="text-white text-lg font-bold tracking-wide drop-shadow-md">AR 预览</h2>
+        <h2 className="text-white text-base font-bold tracking-wide drop-shadow-md opacity-0">AR 预览</h2>
         <button onClick={() => onNavigate(AppScreen.LANDSCAPE_PREVIEW)} className="flex items-center justify-center size-10 rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition-colors border border-white/10">
-          <span className="material-symbols-outlined">center_focus_strong</span>
+          <span className="material-symbols-outlined text-[24px]">center_focus_strong</span>
         </button>
       </div>
 
@@ -106,8 +106,8 @@ const TvSelection: React.FC<Props> = ({
                 key={size}
                 onClick={() => setSelectedSize(size)}
                 className={`group flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 transition-all duration-300 ${selectedSize === size
-                    ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-105'
-                    : 'bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-800 text-slate-600 dark:text-gray-400'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-105'
+                  : 'bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-800 text-slate-600 dark:text-gray-400'
                   }`}
               >
                 <p className={`text-sm ${selectedSize === size ? 'font-bold' : 'font-medium'}`}>{size}吋</p>
@@ -127,8 +127,8 @@ const TvSelection: React.FC<Props> = ({
                 key={model.id}
                 onClick={() => setSelectedModelId(model.id)}
                 className={`snap-center shrink-0 w-[85%] max-w-[320px] flex flex-col rounded-3xl bg-white dark:bg-surface-dark transition-all duration-300 relative overflow-visible cursor-pointer ${selectedModelId === model.id
-                    ? 'shadow-[0_8px_30px_rgba(0,82,204,0.12)] ring-2 ring-primary scale-100 z-10'
-                    : 'shadow-sm border border-gray-100 dark:border-gray-800 opacity-90 scale-95 z-0'
+                  ? 'shadow-[0_8px_30px_rgba(0,82,204,0.12)] ring-2 ring-primary scale-100 z-10'
+                  : 'shadow-sm border border-gray-100 dark:border-gray-800 opacity-90 scale-95 z-0'
                   }`}
               >
                 <div className="h-32 w-full bg-gray-50 dark:bg-gray-800/50 relative flex items-center justify-center p-4 rounded-t-3xl overflow-hidden">

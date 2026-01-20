@@ -60,9 +60,9 @@ const ArMeasureStep2: React.FC<Props> = ({ onNavigate, onCapture }) => {
             </button>
           </div>
           <div className="flex w-full flex-row items-center justify-center gap-2 py-2">
-            <div className="h-1 w-6 rounded-full bg-primary shadow-[0_0_10px_rgba(0,82,204,0.6)]"></div>
-            <div className="h-1 w-1 rounded-full bg-white/40 backdrop-blur-sm"></div>
-            <div className="h-1 w-1 rounded-full bg-white/40 backdrop-blur-sm"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
+            <div className="h-1.5 w-8 rounded-full bg-primary shadow-[0_0_10px_rgba(0,82,204,0.6)]"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
           </div>
         </div>
 

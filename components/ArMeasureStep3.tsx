@@ -23,7 +23,8 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
 
     // If already frozen, proceed
     onCapture(frozenImage);
-    onNavigate(AppScreen.ANALYSIS_RESULT);
+    // Skip AnalysisResult screen as requested, go straight to TV Selection
+    onNavigate(AppScreen.TV_SELECTION);
   }, [frozenImage, onNavigate, onCapture]);
 
   const videoConstraints = {
@@ -72,9 +73,9 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
             </button>
           </div>
           <div className="flex w-full flex-row items-center justify-center gap-2 py-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
             <div className="h-1.5 w-8 rounded-full bg-primary shadow-[0_0_10px_rgba(0,82,204,0.6)]"></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
           </div>
         </div>
 
@@ -173,7 +174,7 @@ const ArMeasureStep3: React.FC<Props> = ({ onNavigate, onCapture }) => {
               className="flex w-full max-w-[280px] cursor-pointer items-center justify-center rounded-full h-12 bg-primary hover:bg-primary/90 active:scale-95 transition-all shadow-[0_0_24px_rgba(0,82,204,0.4)] border border-white/20"
             >
               <span className="text-white text-base font-bold leading-normal tracking-wide mr-2">
-                {frozenImage ? "完成并预览" : "拍摄墙面"}
+                {frozenImage ? "完成并挑选电视" : "拍摄墙面"}
               </span>
               <span className="material-symbols-outlined text-white text-[18px]">
                 {frozenImage ? "check" : "camera_alt"}

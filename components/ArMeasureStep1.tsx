@@ -36,24 +36,24 @@ const ArMeasureStep1: React.FC<Props> = ({ onNavigate }) => {
         </div>
 
         {/* Header */}
-        <div className="relative z-20 w-full pt-safe-top">
-          <div className="flex items-center p-4 pb-2 justify-between text-white mt-8">
-            <button onClick={() => onNavigate(AppScreen.HOME)} className="flex size-12 shrink-0 items-center justify-center rounded-full active:bg-white/10 transition-colors">
-              <span className="material-symbols-outlined text-[28px]">close</span>
+        <div className="relative z-30 w-full pt-safe-top">
+          <div className="flex items-center p-4 pb-2 justify-between text-white mt-4">
+            <button onClick={() => onNavigate(AppScreen.HOME)} className="flex size-10 shrink-0 items-center justify-center rounded-full active:bg-white/10 transition-colors">
+              <span className="material-symbols-outlined text-[24px]">close</span>
             </button>
             <div className="flex flex-col items-center flex-1">
-              <span className="text-white/70 text-xs font-bold uppercase tracking-widest mb-0.5">步骤 1 / 3</span>
-              <h2 className="text-white text-xl font-bold leading-tight tracking-[-0.015em] text-center shadow-black/20 drop-shadow-sm">与墙面对齐</h2>
+              <span className="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5">步骤 1 / 3</span>
+              <h2 className="text-white text-base font-bold leading-tight tracking-tight text-center drop-shadow-md">AR 墙面扫描</h2>
             </div>
             <button
               onClick={() => setShowHelp(true)}
-              className="flex size-12 shrink-0 items-center justify-center rounded-full active:bg-white/10 transition-colors"
+              className="flex size-10 shrink-0 items-center justify-center rounded-full active:bg-white/10 transition-colors"
             >
-              <span className="material-symbols-outlined text-[28px]">help</span>
+              <span className="material-symbols-outlined text-[24px]">help</span>
             </button>
           </div>
           {/* Progress Indicator */}
-          <div className="flex w-full flex-row items-center justify-center gap-3 py-2">
+          <div className="flex w-full flex-row items-center justify-center gap-2 py-2">
             <div className="h-1.5 w-8 rounded-full bg-primary shadow-[0_0_10px_rgba(0,82,204,0.6)]"></div>
             <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
             <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>

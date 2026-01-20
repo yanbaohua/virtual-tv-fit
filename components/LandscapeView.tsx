@@ -47,12 +47,12 @@ const LandscapeView: React.FC<Props> = ({ onNavigate, selectedSize, model, backg
         </div>
 
         {/* Back Button */}
-        <div className="absolute top-8 left-8 z-50">
+        <div className="absolute top-4 left-4 z-50 mt-8">
           <button
             onClick={() => onNavigate(AppScreen.TV_SELECTION)}
             className="flex items-center justify-center size-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-black/60 transition-colors active:scale-95 shadow-xl"
           >
-            <span className="material-symbols-outlined !text-[24px]">arrow_back_ios_new</span>
+            <span className="material-symbols-outlined !text-[24px]">arrow_back</span>
           </button>
         </div>
 
