@@ -13,13 +13,13 @@ const HomeScreen: React.FC<Props> = ({ onNavigate }) => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[60%] bg-gradient-to-tr from-blue-100/50 to-purple-100/50 dark:from-blue-900/10 dark:to-purple-900/10 blur-3xl rounded-full -z-10 pointer-events-none"></div>
 
         {/* Hero Image - Flexible height with max constraint */}
-        <div className="w-full relative group flex-1 min-h-0 shrink basis-auto max-h-[50vh]">
+        <div className="w-full relative group flex-1 min-h-0 shrink basis-auto max-h-[55vh]">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background-light dark:to-background-dark z-10 pointer-events-none h-full w-full"></div>
           <div className="w-full h-full overflow-hidden">
             <img
-              alt="Minimalist abstract 3D composition of a modern living room"
-              className="w-full h-full object-cover object-top opacity-90 dark:opacity-80 transition-transform duration-700 group-hover:scale-105"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDc5jNfn5OsRBUtCwy46v2ehWjIG-Jy_xbncbiVKLfrYdNAwDR_cTbTdiS5se01UqB1M4zvTEiVcGdu3eEEucTMMW8mpnVUPf9whQsTSrIBNTXrIDpedrSsecFnrN00lpcX1Cgu8arlSYyNeKwizn0zrXDaMUtk_5mgi-L4hjpfd3M_AxM1DRzPgbYRJJi_leVn_dp-cOJJQI9Xo31efJ467zdZd6ngogpz39uubUTQa-hwEdJj98QQgNHrF1Nr5O6kW8c4UelByrz9"
+              alt="High-end modern minimalist living room with AR TV preview"
+              className="w-full h-full object-cover object-center opacity-100 dark:opacity-90 transition-transform duration-1000 group-hover:scale-105"
+              src="/images/home-banner.png"
             />
           </div>
         </div>

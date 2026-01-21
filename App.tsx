@@ -81,12 +81,8 @@ const App: React.FC = () => {
           onCapture={(img) => setCapturedImage(img)}
         />
       )}
-      {currentScreen === AppScreen.AR_STEP_3 && (
-        <ArMeasureStep3
-          onNavigate={navigate}
-          onCapture={(img) => setCapturedImage(img)}
-        />
-      )}
+      {/* Step 3 was merged into Step 2 */}
+
       {currentScreen === AppScreen.ANALYSIS_RESULT && (
         <AnalysisResult
           onNavigate={navigate}

@@ -21,11 +21,50 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
     try {
       setIsSaving(true);
 
-      // Use html2canvas to capture the specific element
-      const canvas = await html2canvas(resultCardRef.current, {
+      const element = resultCardRef.current;
+
+      // Use html2canvas with a sophisticated cloning hook to fix alignment JUST FOR CAPTURE
+      const canvas = await html2canvas(element, {
         useCORS: true,
-        scale: 2,
-        backgroundColor: null,
+        scale: 3, // Even higher scale for sharper text
+        backgroundColor: '#ffffff',
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Find the card in the cloned document
+          const card = clonedDoc.body.querySelector('.shadow-2xl');
+          if (card) {
+            (card as HTMLElement).style.borderRadius = '0px';
+            (card as HTMLElement).style.boxShadow = 'none';
+          }
+
+          // FIX BASELINE SHIFT: Apply surgical CSS to all icons and badges in the clone
+          const icons = clonedDoc.querySelectorAll('.material-symbols-outlined');
+          icons.forEach(icon => {
+            (icon as HTMLElement).style.display = 'inline-flex';
+            (icon as HTMLElement).style.alignItems = 'center';
+            (icon as HTMLElement).style.justifyContent = 'center';
+            (icon as HTMLElement).style.paddingTop = '1px'; // Manual compensation for downward shift
+            (icon as HTMLElement).style.lineHeight = '1';
+          });
+
+          const badges = clonedDoc.querySelectorAll('.rounded-full');
+          badges.forEach(badge => {
+            // Ensure text inside pills is perfectly centered
+            const span = badge.querySelector('span');
+            if (span) {
+              (span as HTMLElement).style.display = 'block';
+              (span as HTMLElement).style.lineHeight = '1';
+              (span as HTMLElement).style.marginTop = '-1px'; // Lift text up slightly in capture
+            }
+          });
+
+          // Fix metrics labels
+          const labels = clonedDoc.querySelectorAll('.text-\\[10px\\]');
+          labels.forEach(label => {
+            (label as HTMLElement).style.lineHeight = '1';
+            (label as HTMLElement).style.marginBottom = '2px';
+          });
+        }
       });
 
       // Prefer blob for sharing/performance
@@ -47,14 +86,13 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
               text: '看看这个电视尺寸放在我家合不合适！',
             });
             setIsSaving(false);
-            return; // Exit if shared successfully
+            return;
           } catch (shareError) {
-            console.log('Share canceled or failed, falling back to download', shareError);
-            // Fallback to download if share is canceled or fails (but user might have just cancelled)
+            console.log('Share canceled or failed', shareError);
           }
         }
 
-        // Fallback: Download via <a> tag
+        // Fallback: Download
         const image = canvas.toDataURL("image/png");
         const link = document.createElement('a');
         link.href = image;
@@ -62,20 +100,13 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
+        setIsSaving(false);
       }, 'image/png');
 
     } catch (err) {
       console.error("Failed to save image:", err);
       alert("保存失败，请重试");
-    } finally {
-      // Note: isSaving is set to false in the callback above or here if error, 
-      // but to be safe we might want to ensure it turns off. 
-      // Since toBlob is async, we doing it inside is better, but this finally block runs immediately after *starting* the canvas process, not after toBlob.
-      // So let's actually remove setIsSaving(false) from here and ensure it's called in all paths above.
-
-      // Wait a bit to ensure UI updates if strictly sync, but here we just leave it to the callback.
-      setTimeout(() => setIsSaving(false), 2000); // Failsafe timeout
+      setIsSaving(false);
     }
   };
 
@@ -83,66 +114,131 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
     <div className="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-body h-screen w-full relative flex flex-col overflow-hidden">
 
       {/* Title Header */}
-      <div className="pt-14 pb-2 px-6 text-center z-10 bg-background-light dark:bg-background-dark">
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight">您的客厅方案</h1>
-        <p className="text-xs text-slate-500 font-medium">结果已生成，可保存分享</p>
+      <div className="pt-14 pb-4 px-6 text-center z-10 bg-background-light dark:bg-background-dark">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight">您的客厅方案</h1>
+        <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold max-w-[280px] mx-auto leading-relaxed flex items-center justify-center gap-1.5">
+          <span className="material-symbols-outlined text-[16px] text-primary">diversity_3</span>
+          与家人分享此方案，共同决定最佳尺寸
+        </p>
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto no-scrollbar px-6 pb-48 pt-4 relative">
+      <main className="flex-1 overflow-y-auto no-scrollbar px-6 pb-52 pt-2 relative">
 
-        {/* Result Card */}
-        <div ref={resultCardRef} className="w-full bg-white dark:bg-[#1a222f] rounded-[2rem] overflow-hidden shadow-2xl relative mb-6">
+        {/* Result Card - UI has rounded corners, saved image will be square */}
+        <div ref={resultCardRef} className="w-full bg-white dark:bg-[#1a222f] rounded-[2.5rem] overflow-hidden shadow-2xl relative mb-6 border border-slate-100 dark:border-white/5">
 
-          {/* Image Section - Square aspect ratio to crop ceiling and reduce height */}
-          <div className="relative aspect-square w-full bg-gray-200">
-            {/* Background positioned to show more bottom/center (TV + Floor), cropping top (Ceiling) */}
+          {/* Image Section - Square aspect ratio */}
+          <div className="relative aspect-square w-full bg-slate-200">
+            {/* Background */}
             <div className="absolute inset-0 bg-cover" style={{ backgroundImage: `url('${backgroundImage || "https://lh3.googleusercontent.com/aida-public/AB6AXuCQ7kzg7cHJgUmFgoJvkJcZm5ZjViyOdLaTCTcvyKJ8NNxUEbwIE-2w9cdVHoxJ2AOJQ2Hw0Aj3e-viAE2MHnf6c-K8ungoeGrAZn8qNUN3JckPLQwR83cAO2Tj0aMJJsrRqAosbNmjhmVTViwWitKLhlA1_NDvH3dNVNzIwlQRsNo5mq7Gm0Wvwg9HTRR-e2XycuyS5l8PzFFKxpTtg8W82v-W3p2UOeXAypW0Nu8WIoWbjwUYchoFwqnFeXbU_4TNPh28I1x_zUEo"}')`, backgroundPosition: "center 80%" }}>
-              {/* TV Overlay */}
-              <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] z-20">
-                <div className="relative aspect-video shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                  <img src={currentModel.image} alt="TV Model" className="w-full h-full object-cover rounded-[2px]" />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none rounded-[2px]"></div>
-                  {/* Ambilight glow */}
-                  <div className="absolute -inset-10 bg-blue-500/20 blur-3xl -z-10 rounded-full opacity-60"></div>
+              {/* TV Overlay with Appearance (Bezel) - Width synced with selectedSize */}
+              <div
+                className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-500"
+                style={{
+                  width: selectedSize === 55 ? '35%' :
+                    selectedSize === 65 ? '42%' :
+                      selectedSize === 75 ? '50%' :
+                        selectedSize === 85 ? '60%' :
+                          selectedSize === 100 ? '75%' : '42%'
+                }}
+              >
+                <div className="relative aspect-video rounded-[3px] border-[3px] border-[#121212] bg-black shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
+                  <img src={currentModel.image} alt="TV Model" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none"></div>
+                  <div className="absolute inset-0 shadow-[inset_0_0_15px_rgba(0,0,0,0.5)] pointer-events-none"></div>
                 </div>
+                {/* Ambilight glow */}
+                <div className="absolute -inset-10 bg-primary/25 blur-3xl -z-10 rounded-full opacity-60"></div>
               </div>
             </div>
             {/* Gradient overlay for text visibility */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
-            {/* AR Badge - Removed as per user request */}
-
             {/* TV Info Overlay */}
             <div className="absolute bottom-[28px] left-6 right-6 z-10">
-              <p className="text-white/80 text-xs font-medium mb-1">已选型号</p>
-              <h2 className="text-white text-4xl font-bold leading-tight mb-3 tracking-wide">{currentModel.name}</h2>
+              <p className="text-white/70 text-[10px] uppercase font-bold tracking-widest mb-1.5 drop-shadow-md">建议选型</p>
+              <h2 className="text-white text-3xl font-bold leading-tight mb-3 tracking-tight drop-shadow-lg">
+                {currentModel.name.replace(new RegExp(selectedSize.toString(), 'g'), '').replace(/\s+/g, ' ').trim()}
+              </h2>
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-[#0052cc] text-white text-xs font-bold shadow-lg shadow-blue-900/50">{selectedSize}英寸</span>
-                <span className="text-white/90 text-xs font-medium tracking-wide drop-shadow-sm">{currentModel.subtext}</span>
+                <div className="h-7 px-3.5 rounded-full bg-primary flex items-center justify-center border border-white/20 shadow-lg shadow-blue-900/40">
+                  <span className="text-white text-[11px] font-bold leading-none translate-y-[-0.5px]">{selectedSize}英寸</span>
+                </div>
+                <div className="h-4 w-px bg-white/30"></div>
+                <div className="flex items-center">
+                  <span className="text-white/90 text-xs font-semibold tracking-wide drop-shadow-md leading-none translate-y-[-0.5px]">
+                    {currentModel.subtext.replace(/\d+(英寸|吋)/g, `${selectedSize}$1`)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Metrics Panel */}
-          <div className="bg-white dark:bg-surface-dark px-2 pb-6 pt-2">
-            <div className="flex justify-between items-center px-1">
-              <div className="flex-1 flex flex-col items-center justify-center py-3 relative">
-                <span className="material-symbols-outlined text-primary mb-2 text-2xl">crop_free</span>
-                <span className="text-slate-900 dark:text-white text-xl font-bold leading-none mb-1">4.2<span className="text-sm font-normal text-slate-500 ml-0.5">m</span></span>
-                <span className="text-slate-400 text-[10px] mt-1 font-medium">墙面宽度</span>
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-100 dark:bg-slate-700"></div>
+          {/* Metrics Panel - Restored Original UI Look */}
+          <div className="px-5 pt-8 pb-10 bg-white dark:bg-slate-900 border-t border-slate-50 dark:border-white/5">
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              {/* Wall Width */}
+              <div className="flex items-center gap-3 bg-slate-50 dark:bg-white/5 p-3.5 rounded-2xl border border-slate-100 dark:border-white/10">
+                <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary">
+                  <span className="material-symbols-outlined text-[18px] leading-none translate-y-[-0.5px]">width</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none mb-1">墙面宽度</span>
+                  <span className="text-sm text-slate-900 dark:text-white font-extrabold leading-none">4.2m</span>
+                </div>
               </div>
-              <div className="flex-1 flex flex-col items-center justify-center py-3 relative">
-                <span className="material-symbols-outlined text-primary mb-2 text-2xl">visibility</span>
-                <span className="text-slate-900 dark:text-white text-xl font-bold leading-none mb-1">3.5<span className="text-sm font-normal text-slate-500 ml-0.5">m</span></span>
-                <span className="text-slate-400 text-[10px] mt-1 font-medium">观看距离</span>
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-100 dark:bg-slate-700"></div>
+
+              {/* Wall Height */}
+              <div className="flex items-center gap-3 bg-slate-50 dark:bg-white/5 p-3.5 rounded-2xl border border-slate-100 dark:border-white/10">
+                <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary">
+                  <span className="material-symbols-outlined text-[18px] leading-none translate-y-[-0.5px]">height</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none mb-1">墙面高度</span>
+                  <span className="text-sm text-slate-900 dark:text-white font-extrabold leading-none">2.8m</span>
+                </div>
               </div>
-              <div className="flex-1 flex flex-col items-center justify-center py-3">
-                <span className="material-symbols-outlined text-primary mb-2 text-2xl">tv</span>
-                <span className="text-slate-900 dark:text-white text-xl font-bold leading-none mb-1">{selectedSize}<span className="text-sm font-normal text-slate-500 ml-0.5">"</span></span>
-                <span className="text-slate-400 text-[10px] mt-1 font-medium">电视尺寸</span>
+
+              {/* Distance */}
+              <div className="flex items-center gap-3 bg-slate-50 dark:bg-white/5 p-3.5 rounded-2xl border border-slate-100 dark:border-white/10">
+                <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary">
+                  <span className="material-symbols-outlined text-[18px] leading-none translate-y-[-0.5px]">straighten</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none mb-1">观看距离</span>
+                  <span className="text-sm text-slate-900 dark:text-white font-extrabold leading-none">3.5m</span>
+                </div>
+              </div>
+
+              {/* TV Size */}
+              <div className="flex items-center gap-3 bg-primary/5 p-3.5 rounded-2xl border border-primary/10">
+                <div className="size-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0 text-primary">
+                  <span className="material-symbols-outlined text-[18px] leading-none translate-y-[-0.5px]">tv</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-primary font-bold uppercase tracking-wider leading-none mb-1">电视尺寸</span>
+                  <span className="text-sm text-primary font-extrabold leading-none">{selectedSize}英寸</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Price / Recommendation Badge */}
+            <div className="flex items-center justify-between px-1">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 leading-none">市场参考价</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-black text-primary leading-none">
+                    {typeof currentModel.price === 'string' && currentModel.price.includes('¥')
+                      ? currentModel.price
+                      : `¥${Number(currentModel.price || 5999).toLocaleString()}`}
+                  </span>
+                  <span className="text-xs font-bold text-slate-400 leading-none mb-0.5">起</span>
+                </div>
+              </div>
+              <div className="h-9 px-4 bg-emerald-500 text-white rounded-full flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20">
+                <span className="material-symbols-outlined text-[16px] filled leading-none translate-y-[-0.5px]">verified</span>
+                <span className="text-[11px] font-bold tracking-tight leading-none">最佳方案</span>
               </div>
             </div>
           </div>
@@ -151,23 +247,23 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
       </main>
 
       {/* Fixed Bottom Area */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 w-full flex flex-col items-center pb-6 pt-12 bg-gradient-to-t from-background-light via-background-light/95 to-transparent dark:from-background-dark dark:via-background-dark/95 px-6">
+      <div className="absolute bottom-0 left-0 right-0 z-20 w-full flex flex-col items-center pb-10 pt-20 bg-gradient-to-t from-background-light via-background-light/95 to-transparent dark:from-background-dark dark:via-background-dark/95 px-6">
 
-        {/* Save Button - Adjusted padding for lower position */}
+        {/* Save Button - Size matched to 280px / h-12 */}
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full max-w-[340px] h-14 bg-[#0052cc] hover:bg-blue-600 disabled:bg-blue-400 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-blue-500/30 transition-transform active:scale-[0.98] mb-3"
+          className={`flex w-full max-w-[280px] cursor-pointer items-center justify-center rounded-full h-12 bg-primary hover:bg-primary/90 active:scale-95 transition-all shadow-[0_0_24px_rgba(0,82,204,0.4)] border border-white/20 disabled:bg-slate-400 ${isSaving ? 'opacity-70' : ''}`}
         >
           {isSaving ? (
             <>
-              <span className="material-symbols-outlined text-[24px] animate-spin">progress_activity</span>
-              <span>保存中...</span>
+              <span className="material-symbols-outlined text-[18px] animate-spin mr-2">progress_activity</span>
+              <span className="text-white text-base font-bold">正在保存...</span>
             </>
           ) : (
             <>
-              <span className="material-symbols-outlined text-[24px]">download</span>
-              <span>保存到相册</span>
+              <span className="text-white text-base font-bold leading-normal tracking-wide mr-2">保存到相册</span>
+              <span className="material-symbols-outlined text-white text-[18px]">download</span>
             </>
           )}
         </button>
@@ -175,27 +271,22 @@ const FinalResult: React.FC<Props> = ({ onNavigate, selectedSize, model, backgro
         {/* New Simulation Link */}
         <button
           onClick={() => onNavigate(AppScreen.HOME)}
-          className="text-slate-400 text-sm font-medium hover:text-slate-600 mb-2 py-1 px-4"
+          className="mt-4 text-slate-400 dark:text-slate-500 text-xs font-bold hover:text-primary dark:hover:text-primary transition-colors py-2 px-4"
         >
           开始新模拟
         </button>
-
-        {/* Share Hint */}
-        <p className="text-[10px] text-slate-300 dark:text-slate-600 text-center font-light tracking-wide">
-          与家人分享此方案，共同决定最佳尺寸。
-        </p>
       </div>
 
       {/* Top Floating Buttons */}
-      <div className="absolute top-0 left-0 right-0 p-4 pt-4 mt-8 flex justify-between items-center z-30 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 p-4 pt-safe-top mt-4 flex justify-between items-center z-30 pointer-events-none">
         {/* Back Button */}
-        <button onClick={() => onNavigate(AppScreen.TV_SELECTION)} className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-slate-100/50 hover:bg-slate-200/50 dark:bg-white/10 dark:hover:bg-white/20 transition-colors backdrop-blur-md">
-          <span className="material-symbols-outlined text-slate-900 dark:text-white text-[24px]">arrow_back</span>
+        <button onClick={() => onNavigate(AppScreen.TV_SELECTION)} className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-black/20 hover:bg-black/30 text-white transition-colors backdrop-blur-md border border-white/10">
+          <span className="material-symbols-outlined text-[24px]">arrow_back</span>
         </button>
 
         {/* Share Button (Triggers Sheet) */}
-        <button onClick={() => setShowShareSheet(true)} className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-slate-100/50 hover:bg-slate-200/50 dark:bg-white/10 dark:hover:bg-white/20 transition-colors backdrop-blur-md">
-          <span className="material-symbols-outlined text-slate-900 dark:text-white text-[24px]">ios_share</span>
+        <button onClick={() => setShowShareSheet(true)} className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-black/20 hover:bg-black/30 text-white transition-colors backdrop-blur-md border border-white/10">
+          <span className="material-symbols-outlined text-[24px]">ios_share</span>
         </button>
       </div>
 

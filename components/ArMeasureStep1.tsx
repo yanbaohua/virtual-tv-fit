@@ -8,6 +8,14 @@ interface Props {
 
 const ArMeasureStep1: React.FC<Props> = ({ onNavigate }) => {
   const [showHelp, setShowHelp] = useState(false);
+  const [measurementDone, setMeasurementDone] = useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setMeasurementDone(true);
+    }, 2000); // 2s duration for measurement
+    return () => clearTimeout(timer);
+  }, []);
 
   const videoConstraints = {
     facingMode: "environment"
@@ -42,7 +50,7 @@ const ArMeasureStep1: React.FC<Props> = ({ onNavigate }) => {
               <span className="material-symbols-outlined text-[24px]">close</span>
             </button>
             <div className="flex flex-col items-center flex-1">
-              <span className="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5">步骤 1 / 3</span>
+              <span className="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5">步骤 1 / 2</span>
               <h2 className="text-white text-base font-bold leading-tight tracking-tight text-center drop-shadow-md">AR 墙面扫描</h2>
             </div>
             <button
@@ -56,15 +64,31 @@ const ArMeasureStep1: React.FC<Props> = ({ onNavigate }) => {
           <div className="flex w-full flex-row items-center justify-center gap-2 py-2">
             <div className="h-1.5 w-8 rounded-full bg-primary shadow-[0_0_10px_rgba(0,82,204,0.6)]"></div>
             <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-white/40 backdrop-blur-sm"></div>
           </div>
         </div>
 
         {/* AR Overlays */}
         <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
-          {/* Distance Tag - Simulated "Measuring..." */}
-          <div className="absolute top-[35%] animate-bounce [animation-duration:2s]">
-            <div className="flex h-10 shrink-0 items-center justify-center gap-x-2.5 rounded-full bg-white/95 backdrop-blur-xl pl-3 pr-5 shadow-lg shadow-black/20 ring-1 ring-white/50">
+
+          {/* Measurement Animation Line (Bottom to Top) */}
+          {!measurementDone && (
+            <div className="absolute w-[80%] bottom-0 h-full overflow-hidden flex justify-center">
+              <div className="w-full h-1 bg-primary/50 absolute bottom-0 shadow-[0_0_20px_rgba(0,82,204,0.8)] animate-[scan-vertical_2s_ease-in-out_forwards]"></div>
+            </div>
+          )}
+
+          <style>{`
+            @keyframes scan-vertical {
+              0% { bottom: 0; opacity: 0; }
+              10% { opacity: 1; }
+              90% { opacity: 1; }
+              100% { bottom: 60%; opacity: 0; }
+            }
+          `}</style>
+
+          {/* Distance Tag - Appear after measurement */}
+          <div className={`absolute top-[35%] transition-all duration-700 transform ${measurementDone ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
+            <div className="flex h-10 shrink-0 items-center justify-center gap-x-2.5 rounded-full bg-white/95 backdrop-blur-xl pl-3 pr-5 shadow-lg shadow-black/20 ring-1 ring-white/50 animate-bounce">
               <span className="material-symbols-outlined text-primary text-[20px]">straighten</span>
               <p className="text-slate-900 text-sm font-bold leading-normal font-display tracking-tight">沙发至墙面距离: <span className="text-primary text-base">3.5m</span></p>
             </div>
